@@ -1,5 +1,7 @@
 using Core;
+using Core.Repository;
 using Core.Service;
+using Infra.Repository;
 using Microsoft.EntityFrameworkCore;
 using Service;
 using Core.Identity.Data;
@@ -22,6 +24,7 @@ namespace BibliotecaWeb
             {
                 options.Filters.Add<CustomExceptionFilter>();
             }) ;
+            builder.Services.AddTransient<IAutorRepository, AutorRepository>();
             builder.Services.AddTransient<IAutorService, AutorService>();
             builder.Services.AddTransient <IEditoraService, EditoraService> ();
             builder.Services.AddTransient<ILivroService, LivroService>();

@@ -2,7 +2,9 @@
 using BibliotecaAPI.Filter;
 using Core;
 using Core.Identity.Data;
+using Core.Repository;
 using Core.Service;
+using Infra.Repository;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Service;
@@ -22,6 +24,7 @@ namespace BibliotecaAPI
             builder.Services.AddEndpointsApiExplorer();
             builder.Services.AddSwaggerGen();
             
+            builder.Services.AddTransient<IAutorRepository, AutorRepository>();
             builder.Services.AddTransient<IAutorService, AutorService>();
             builder.Services.AddTransient<ILivroService, LivroService>();
             

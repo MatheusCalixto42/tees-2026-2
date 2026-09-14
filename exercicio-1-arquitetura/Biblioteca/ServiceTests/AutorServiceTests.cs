@@ -1,6 +1,9 @@
-﻿using Core;
+using Core;
+using Core.Repository;
 using Core.Service;
+using Infra.Repository;
 using Microsoft.EntityFrameworkCore;
+using Moq;
 
 namespace Service.Tests
 {
@@ -31,7 +34,9 @@ namespace Service.Tests
             context.AddRange(autores);
             context.SaveChanges();
 
-            autorService = new AutorService(context);
+            // Adaptador de persistência (AutorRepository) injetado no serviço via porta IAutorRepository
+            var autorRepository = new AutorRepository(context);
+            autorService = new AutorService(autorRepository);
         }
 
         [TestMethod()]
@@ -42,6 +47,7 @@ namespace Service.Tests
             // Assert
             Assert.AreEqual(4, autorService.GetAll().Count());
             var autor = autorService.Get(4);
+            Assert.IsNotNull(autor);
             Assert.AreEqual("Graciliano Ramos", autor.Nome);
             Assert.AreEqual(DateTime.Parse("1900-12-25"), autor.DataNascimento);
         }
@@ -62,6 +68,7 @@ namespace Service.Tests
         {
             //Act 
             var autor = autorService.Get(3);
+            Assert.IsNotNull(autor);
             autor.Nome = "Paulo Coelho";
             autor.DataNascimento = DateTime.Parse("1950-11-21");
             autorService.Edit(autor);
@@ -104,5 +111,69 @@ namespace Service.Tests
             Assert.AreEqual(1, autores.Count());
             Assert.AreEqual("Machado de Assis", autores.First().Nome);
         }
+
+        #region Testes Unitários com Mock (Isolamento 100% da Regra de Negócio)
+
+        [TestMethod()]
+        [ExpectedException(typeof(ServiceException))]
+        public void Create_AnoNascimentoMenorQue1000_LancaServiceExceptionSemChamarBanco()
+        {
+            // Arrange
+            var mockRepo = new Mock<IAutorRepository>();
+            var service = new AutorService(mockRepo.Object);
+            var autorInvalido = new Autor { Id = 10, Nome = "Autor Antigo", DataNascimento = new DateTime(999, 1, 1) };
+
+            // Act
+            try
+            {
+                service.Create(autorInvalido);
+            }
+            finally
+            {
+                // Assert: garante que o repositório NUNCA foi chamado devido à regra de negócio
+                mockRepo.Verify(r => r.Insert(It.IsAny<Autor>()), Times.Never);
+            }
+        }
+
+        [TestMethod()]
+        [ExpectedException(typeof(ServiceException))]
+        public void Edit_AnoNascimentoMenorQue1000_LancaServiceExceptionSemChamarBanco()
+        {
+            // Arrange
+            var mockRepo = new Mock<IAutorRepository>();
+            var service = new AutorService(mockRepo.Object);
+            var autorInvalido = new Autor { Id = 10, Nome = "Autor Antigo", DataNascimento = new DateTime(950, 5, 20) };
+
+            // Act
+            try
+            {
+                service.Edit(autorInvalido);
+            }
+            finally
+            {
+                // Assert: garante que o repositório NUNCA foi chamado devido à regra de negócio
+                mockRepo.Verify(r => r.Update(It.IsAny<Autor>()), Times.Never);
+            }
+        }
+
+        [TestMethod()]
+        public void Create_AutorValido_ChamaRepositorioRetornaIdIsolado()
+        {
+            // Arrange: teste unitário puro, sem banco de dados, sem EF Core, sem DbContext
+            var mockRepo = new Mock<IAutorRepository>();
+            var autor = new Autor { Id = 5, Nome = "Clarice Lispector", DataNascimento = new DateTime(1920, 12, 10) };
+            mockRepo.Setup(r => r.Insert(autor)).Returns(5);
+
+            var service = new AutorService(mockRepo.Object);
+
+            // Act
+            var idCriado = service.Create(autor);
+
+            // Assert
+            Assert.AreEqual((uint)5, idCriado);
+            mockRepo.Verify(r => r.Insert(autor), Times.Once);
+        }
+
+        #endregion
     }
 }
