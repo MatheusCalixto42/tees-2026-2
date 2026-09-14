@@ -19,12 +19,3 @@ Repositório destinado ao desenvolvimento e entrega das atividades práticas da 
 | Unidade | Atividade | Descrição | Status |
 | :--- | :--- | :--- | :---: |
 | **Unidade 1** | [Exercício 1 — Adaptação Arquitetural](./exercicio-1-arquitetura/README.md) | Migração da fatia vertical do agregado `Autor` para Clean / Hexagonal Architecture (Portas e Adaptadores). | Concluído ✅ |
-
----
-
-## 🛠️ Tecnologias e Ferramentas
-
-- **Linguagem / Framework:** C# / .NET 8 (compatível com .NET 10)
-- **ORM / Persistência:** Entity Framework Core / MySQL
-- **Testes Automatizados:** MSTest / Moq
-- **Controle de Versão:** Git / GitHub
