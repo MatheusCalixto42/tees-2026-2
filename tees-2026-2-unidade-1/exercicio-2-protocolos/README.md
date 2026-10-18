@@ -103,13 +103,64 @@ tees-2026-2-unidade-1/
 Nome da pasta conforme o protocolo, por exemplo rest-json/, soap-xml/, graphql/, grpc/ ou websockets/. Essa é a estrutura para dois projetos separados, num projeto único adapte as pastas, mas mantenha os dois protocolos separados e identificáveis, e o README.md continua trazendo a comparação final.
 
 
-## O que foi feito
+## Protocolos Escolhidos
 
-### Escolha de Protocolos
+* **REST (JSON):** Arquitetura orientada a recursos sobre HTTP.
+* **GraphQL (JSON):** Linguagem de consulta declarativa sobre HTTP.
 
-#### REST - JSON
+---
 
-#### GraphQL - JSON
+## Como Executar do Zero
 
-### Estrutura de Pastas
+### 1. Criar e Ativar Ambiente Virtual
+```bash
+python3 -m venv .venv
+source .venv/bin/activate
+```
+
+### 2. Instalar Dependências
+```bash
+pip install -r requirements.txt
+```
+
+### 3. Iniciar o Servidor
+```bash
+uvicorn main:app --reload --port 8000
+```
+
+* **Swagger UI (REST):** [http://localhost:8000/docs](http://localhost:8000/docs)
+* **GraphiQL (GraphQL):** [http://localhost:8000/graphql](http://localhost:8000/graphql)
+
+### 4. Scripts Auxiliares
+* **Popular o banco com dados de exemplo:**
+  ```bash
+  python seed.py
+  ```
+* **Resetar o banco (apagar tudo e recriar vazio):**
+  ```bash
+  python seed.py --reset
+  ```
+* **Executar suíte de testes dos 5 comandos e 5 consultas:**
+  ```bash
+  python test_protocols.py
+  ```
+
+---
+
+## Comparação Final
+
+> **O que o REST faz melhor que o GraphQL neste domínio:**  
+> O REST oferece simplicidade arquitetural máxima, padronização universal com verbos HTTP e se beneficia nativamente do ecossistema de **cache HTTP na borda** para recursos que mudam pouco (como fotos de perfil e dados cadastrais), sem necessidade de interpretar parsers de consultas.
+
+> **O que o GraphQL faz melhor que o REST neste domínio:**  
+> O GraphQL permite que o cliente declare em **uma única requisição** exatamente a árvore de dados relacional necessária (ex: post, autor, contagem de curtidas e comentários com seus respectivos autores), **eliminando completamente o problema de under-fetching (N+1 roundtrips) e o over-fetching** de dados no feed da rede social.
+
+---
+
+## Documentação Específica dos Protocolos
+
+Para os exemplos copiáveis de requisição e resposta de cada operação:
+* 📄 [Documentação do Protocolo REST](protocolo-rest/README.md)
+* 📄 [Documentação do Protocolo GraphQL](protocolo-graphql/README.md)
+
 
