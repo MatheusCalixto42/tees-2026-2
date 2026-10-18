@@ -16,16 +16,20 @@ app = FastAPI(
     lifespan=lifespan
 )
 
-# 1. Registro do Protocolo REST
+# Registro do Protocolo REST
 rest_module = importlib.import_module("protocolo-rest.routes")
 app.include_router(rest_module.router)
+
+# Registro do Protocolo GraphQL
+graphql_module = importlib.import_module("protocolo-graphql.schema")
+app.include_router(graphql_module.graphql_app, prefix="/graphql")
 
 @app.get("/", tags=["Root"])
 def root():
     return {
         "mensagem": "API de Rede Social ativa!",
         "documentacao_rest": "/docs",
-        "protocolo_graphql": "/graphql (disponível em breve)"
+        "interface_graphql": "/graphql"
     }
 
 if __name__ == "__main__":

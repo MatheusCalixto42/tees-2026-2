@@ -19,11 +19,11 @@ def criar_usuario(nome: str, email: str, bio: str = "", foto_url: str = "", db_p
                 "INSERT INTO perfis (usuario_id, bio, foto_url) VALUES (?, ?, ?);",
                 (usuario_id, bio.strip(), foto_url.strip())
             )
-            return buscar_usuario(usuario_id, db_path=db_path)
         except Exception as e:
             if "UNIQUE constraint failed: usuarios.email" in str(e):
                 raise ValueError(f"Email '{email}' já está em uso.")
             raise
+    return buscar_usuario(usuario_id, db_path=db_path)
 
 def criar_post(usuario_id: int, texto: str, db_path: str = None) -> Dict[str, Any]:
     """Cria uma nova publicação para o usuário."""
@@ -42,7 +42,7 @@ def criar_post(usuario_id: int, texto: str, db_path: str = None) -> Dict[str, An
             (usuario_id, texto.strip())
         )
         post_id = cursor.lastrowid
-        return buscar_post(post_id, db_path=db_path)
+    return buscar_post(post_id, db_path=db_path)
 
 def comentar(usuario_id: int, post_id: int, texto: str, db_path: str = None) -> Dict[str, Any]:
     """Adiciona um comentário a uma publicação (relacionamento N:M com atributo)."""
