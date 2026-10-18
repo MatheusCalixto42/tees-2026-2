@@ -1,9 +1,11 @@
 """
-Script para popular o banco de dados SQLite (social.db) com dados fictícios.
-Execute com:
-    python seed.py
-ou com reset:
+Script para gerenciar o banco de dados SQLite (social.db):
+
+1. Resetar o banco (apaga e recria tabelas vazias):
     python seed.py --reset
+
+2. Popular o banco com dados fictícios:
+    python seed.py
 """
 
 import sys
@@ -12,16 +14,16 @@ from core.database import init_db, get_db
 from core import repository
 
 def reset_db():
+    print("🧹 Resetando banco de dados do zero...")
+    db_file = os.environ.get("DB_PATH", "social.db")
+    if os.path.exists(db_file):
+        try:
+            os.remove(db_file)
+        except Exception:
+            pass
     init_db()
-    print("🧹 Limpando dados existentes...")
-    with get_db() as conn:
-        cursor = conn.cursor()
-        cursor.execute("DELETE FROM curtidas;")
-        cursor.execute("DELETE FROM comentarios;")
-        cursor.execute("DELETE FROM segue;")
-        cursor.execute("DELETE FROM posts;")
-        cursor.execute("DELETE FROM perfis;")
-        cursor.execute("DELETE FROM usuarios;")
+    print("✨ Banco de dados limpo e reinicializado com sucesso (tabelas criadas e vazias)!")
+    print("💡 Para popular com os dados fictícios, execute: python seed.py")
 
 def populate():
     print("🌱 Populando banco de dados com dados iniciais...")
@@ -114,10 +116,11 @@ def populate():
 if __name__ == "__main__":
     if "--reset" in sys.argv:
         reset_db()
-    try:
-        populate()
-    except Exception as e:
-        if "UNIQUE constraint failed: usuarios.email" in str(e):
-            print("⚠️ Os dados já existem no banco. Use 'python seed.py --reset' para recriar.")
-        else:
-            raise e
+    else:
+        try:
+            populate()
+        except Exception as e:
+            if "UNIQUE constraint failed: usuarios.email" in str(e):
+                print("⚠️ Os dados já existem no banco. Para resetar e recriar, use 'python seed.py --reset'.")
+            else:
+                raise e
